@@ -1,0 +1,536 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f0f5ff;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.container {
+    display: flex;
+    flex: 1;
+}
+
+.search-panel {
+    width: 300px;
+    background-color: #fff;
+    padding: 1rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin: 1rem 0 1rem 1rem;
+    z-index: 10;
+}
+
+.map-container {
+    flex: 1;
+    height: 75vh;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1rem;
+    border: 2px solid #fff;
+    position: relative;
+}
+
+#patent-map {
+    height: 100%;
+    width: 100%;
+    background-color: #e6f2ff;
+}
+
+/* Harita ikon stilleri */
+.leaflet-marker-icon {
+    border: 2px solid white !important;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Popup stillerini güncelle */
+.leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    border: 1px solid #e0e0e0;
+}
+
+.leaflet-popup-content {
+    margin: 10px;
+    line-height: 1.5;
+}
+
+.leaflet-popup-tip {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Harita kontrol stillerini güncelle */
+.leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2) !important;
+    margin: 15px !important;
+}
+
+.leaflet-control-zoom a {
+    background-color: #fff !important;
+    color: #1e3c72 !important;
+    border: none !important;
+    font-weight: bold !important;
+    transition: all 0.3s !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background-color: #e3eeff !important;
+    color: #1e3c72 !important;
+}
+
+.search-form {
+    margin-top: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #2a5298;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #4a69bd;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 105, 189, 0.2);
+}
+
+button {
+    background: linear-gradient(to right, #4a69bd, #6a89cc);
+    color: #fff;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background: linear-gradient(to right, #3c58a8, #5878c5);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.results-panel {
+    background-color: #fff;
+    padding: 1rem;
+    margin: 1rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+#results-container {
+    margin-top: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.patent-item {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.patent-item:hover {
+    background-color: #f0f5ff;
+    border-left: 4px solid #4a69bd;
+}
+
+.patent-details {
+    position: fixed;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    max-height: 80%;
+    background-color: #fff;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    overflow-y: auto;
+    display: none;
+    border-radius: 12px;
+}
+
+.details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.close-btn {
+    background: linear-gradient(to right, #e74c3c, #ff5e57);
+    color: #fff;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.details-content {
+    line-height: 1.8;
+}
+
+.detail-row {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.detail-label {
+    font-weight: bold;
+    color: #1e3c72;
+}
+
+/* Patent popup styles */
+.patent-popup {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+}
+
+.patent-popup h3 {
+    margin: 0 0 5px 0;
+    color: #1e3c72;
+    font-size: 14px;
+}
+
+.patent-popup p {
+    margin: 5px 0;
+    color: #555;
+    font-size: 12px;
+}
+
+.region-tag {
+    display: inline-block;
+    background-color: #e3eeff;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px !important;
+    color: #1e3c72 !important;
+    margin-bottom: 5px !important;
+    border: 1px solid #c9d6ff;
+    font-weight: bold;
+}
+
+.details-link {
+    display: inline-block;
+    color: #4a69bd;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: bold;
+    transition: color 0.2s;
+    margin-top: 5px;
+}
+
+.details-link:hover {
+    color: #1e3c72;
+    text-decoration: underline;
+}
+
+/* Compare button styles */
+.compare-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: linear-gradient(to right, #2ecc71, #27ae60);
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+
+.compare-btn:hover {
+    background: linear-gradient(to right, #27ae60, #219a52);
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    color: #333;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+}
+
+.modal-body {
+    padding: 10px 0;
+}
+
+.compare-submit {
+    width: 100%;
+    margin-top: 20px;
+    background: linear-gradient(to right, #2ecc71, #27ae60);
+}
+
+.compare-submit:hover {
+    background: linear-gradient(to right, #27ae60, #219a52);
+}
+
+/* Comparison Results Styles */
+.comparison-results {
+    position: fixed;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    max-height: 80%;
+    background-color: #fff;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    overflow-y: auto;
+    border-radius: 12px;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.comparison-row {
+    display: flex;
+    border-bottom: 1px solid #eee;
+}
+
+.comparison-row.header {
+    background-color: #f0f5ff;
+    font-weight: bold;
+    color: #1e3c72;
+}
+
+.comparison-cell {
+    flex: 1;
+    padding: 12px;
+    text-align: left;
+    word-break: break-word;
+}
+
+.comparison-cell:first-child {
+    flex: 0.5;
+    font-weight: bold;
+    color: #1e3c72;
+}
+
+.comparison-cell.patent1 {
+    background-color: rgba(46, 204, 113, 0.1);
+}
+
+.comparison-cell.patent2 {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.comparison-content {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Similarity Score Styles */
+.similarity-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 20px;
+}
+
+.similarity-score {
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    transition: color 0.3s;
+    cursor: pointer;
+}
+
+.similarity-score:hover {
+    transform: scale(1.05);
+}
+
+/* Comparison Modal Styles */
+.compare-container {
+    display: flex;
+    gap: 20px;
+}
+
+.patent-list-panel {
+    width: 300px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+}
+
+.patent-list-panel h3 {
+    margin-bottom: 15px;
+    color: #1e3c72;
+    font-size: 1.1em;
+}
+
+.patent-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.patent-list-item {
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.patent-list-item:hover {
+    background-color: #e3eeff;
+}
+
+.patent-list-item.selected {
+    background-color: #c9d6ff;
+    border-left: 4px solid #4a69bd;
+}
+
+.patent-list-item .patent-no {
+    font-weight: bold;
+    color: #1e3c72;
+    margin-bottom: 5px;
+}
+
+.patent-list-item .patent-title {
+    font-size: 0.9em;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.compare-form {
+    flex: 1;
+}
+
+/* Similarity Analysis Modal Styles */
+.similarity-analysis {
+    padding: 20px;
+}
+
+.similarity-category {
+    margin-bottom: 25px;
+}
+
+.similarity-category h3 {
+    color: #1e3c72;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.similarity-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.similarity-progress {
+    height: 100%;
+    background: linear-gradient(to right, #4a69bd, #6a89cc);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.similarity-details {
+    font-size: 0.9em;
+    color: #555;
+    padding: 5px 0;
+}
+
+.similarity-details.highlight {
+    color: #2ecc71;
+    font-weight: bold;
+} 

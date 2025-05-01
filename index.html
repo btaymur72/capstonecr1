@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patent Map System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Patent Map System</h1>
+            <button id="compare-btn" class="compare-btn">Compare Patents</button>
+        </header>
+        
+        <div class="container">
+            <div class="search-panel">
+                <h2>Patent Search</h2>
+                <div class="search-form">
+                    <div class="form-group">
+                        <label for="patent-no">Patent No:</label>
+                        <input type="text" id="patent-no" placeholder="Enter patent number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="keywords">Keywords:</label>
+                        <input type="text" id="keywords" placeholder="Enter keywords">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="applicant">Applicant:</label>
+                        <input type="text" id="applicant" placeholder="Institution or person name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="region">Region:</label>
+                        <select id="region">
+                            <option value="">All Regions</option>
+                            <option value="TURKEY">Turkey</option>
+                            <option value="USA">USA</option>
+                            <option value="EU">European Union</option>
+                            <option value="ASIA">Asia</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Patent Status:</label>
+                        <select id="status">
+                            <option value="">All</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    
+                    <button id="search-btn">Search</button>
+                </div>
+            </div>
+            
+            <div class="map-container">
+                <div id="patent-map"></div>
+            </div>
+        </div>
+        
+        <div class="results-panel">
+            <h2>Search Results</h2>
+            <div id="results-container">
+                <!-- Results will be loaded here -->
+            </div>
+        </div>
+        
+        <div id="patent-details" class="patent-details">
+            <div class="details-header">
+                <h2>Patent Details</h2>
+                <button class="close-btn">X</button>
+            </div>
+            <div class="details-content">
+                <!-- Patent details will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Comparison Results -->
+        <div id="comparison-results" class="comparison-results" style="display: none;">
+            <div class="details-header">
+                <h2>Patent Comparison</h2>
+                <div class="similarity-display">
+                    <span>Similarity Score:</span>
+                    <span id="similarity-score" class="similarity-score">0%</span>
+                </div>
+                <button class="close-btn" onclick="closeComparison()">X</button>
+            </div>
+            <div class="comparison-content">
+                <div class="comparison-table">
+                    <div class="comparison-row header">
+                        <div class="comparison-cell">Property</div>
+                        <div class="comparison-cell patent1">Patent 1</div>
+                        <div class="comparison-cell patent2">Patent 2</div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">Patent Number</div>
+                        <div class="comparison-cell patent1" id="compare-no1"></div>
+                        <div class="comparison-cell patent2" id="compare-no2"></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">Keywords</div>
+                        <div class="comparison-cell patent1" id="compare-keywords1"></div>
+                        <div class="comparison-cell patent2" id="compare-keywords2"></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">Abstract</div>
+                        <div class="comparison-cell patent1" id="compare-abstract1"></div>
+                        <div class="comparison-cell patent2" id="compare-abstract2"></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">Application Date</div>
+                        <div class="comparison-cell patent1" id="compare-appdate1"></div>
+                        <div class="comparison-cell patent2" id="compare-appdate2"></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">Publication Date</div>
+                        <div class="comparison-cell patent1" id="compare-pubdate1"></div>
+                        <div class="comparison-cell patent2" id="compare-pubdate2"></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">Applicant</div>
+                        <div class="comparison-cell patent1" id="compare-applicant1"></div>
+                        <div class="comparison-cell patent2" id="compare-applicant2"></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">IPC</div>
+                        <div class="comparison-cell patent1" id="compare-ipc1"></div>
+                        <div class="comparison-cell patent2" id="compare-ipc2"></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">CPC</div>
+                        <div class="comparison-cell patent1" id="compare-cpc1"></div>
+                        <div class="comparison-cell patent2" id="compare-cpc2"></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">Geographic Region</div>
+                        <div class="comparison-cell patent1" id="compare-region1"></div>
+                        <div class="comparison-cell patent2" id="compare-region2"></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-cell">Patent Status</div>
+                        <div class="comparison-cell patent1" id="compare-status1"></div>
+                        <div class="comparison-cell patent2" id="compare-status2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Similarity Analysis Modal -->
+        <div id="similarity-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Detailed Similarity Analysis</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="similarity-analysis">
+                        <div class="similarity-category">
+                            <h3>Keywords Similarity</h3>
+                            <div class="similarity-bar">
+                                <div class="similarity-progress" id="keywords-progress"></div>
+                            </div>
+                            <div class="similarity-details" id="keywords-details"></div>
+                        </div>
+                        <div class="similarity-category">
+                            <h3>Abstract Similarity</h3>
+                            <div class="similarity-bar">
+                                <div class="similarity-progress" id="abstract-progress"></div>
+                            </div>
+                            <div class="similarity-details" id="abstract-details"></div>
+                        </div>
+                        <div class="similarity-category">
+                            <h3>IPC/CPC Similarity</h3>
+                            <div class="similarity-bar">
+                                <div class="similarity-progress" id="ipc-progress"></div>
+                            </div>
+                            <div class="similarity-details" id="ipc-details"></div>
+                        </div>
+                        <div class="similarity-category">
+                            <h3>Geographic Region</h3>
+                            <div class="similarity-bar">
+                                <div class="similarity-progress" id="region-progress"></div>
+                            </div>
+                            <div class="similarity-details" id="region-details"></div>
+                        </div>
+                        <div class="similarity-category">
+                            <h3>Applicant</h3>
+                            <div class="similarity-bar">
+                                <div class="similarity-progress" id="applicant-progress"></div>
+                            </div>
+                            <div class="similarity-details" id="applicant-details"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Modal -->
+        <div id="compare-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Compare Patents</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="compare-container">
+                        <div class="patent-list-panel">
+                            <h3>Available Patents</h3>
+                            <div class="patent-list">
+                                <!-- Patent list will be loaded here -->
+                            </div>
+                        </div>
+                        <div class="compare-form">
+                            <div class="form-group">
+                                <label for="compare-patent1">First Patent Number:</label>
+                                <input type="text" id="compare-patent1" placeholder="Enter first patent number">
+                            </div>
+                            <div class="form-group">
+                                <label for="compare-patent2">Second Patent Number:</label>
+                                <input type="text" id="compare-patent2" placeholder="Enter second patent number">
+                            </div>
+                            <button id="compare-submit" class="compare-submit">Compare</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="app.js"></script>
+</body>
+</html> 
